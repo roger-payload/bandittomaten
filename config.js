@@ -404,8 +404,8 @@ const CONFIG = {
 	blackjackBonus: {
 		chanceStep:          0.05,  // added to bonusChance each spin
 		chanceOnReset:       0.05,  // bonusChance value after a bonus triggers
-		handBetOptions:      [5, 10, 15, 20],
-		sideBetOptions:      [1, 2, 5],
+		handBetOptions:      [5, 6, 7, 8, 9, 10, 12, 15, 20],
+		sideBetOptions:      [1, 2, 3, 4],
 		maxHandsMultiplier:  0.35,
 		maxHands:            8,
 		minHands:            1

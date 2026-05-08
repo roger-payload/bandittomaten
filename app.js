@@ -1004,15 +1004,35 @@ function buildBlackjackBonus(balance) {
 		{ value: 2, weight: 60 }
 	]).value;
 
-	const leftSidebet  = sideBetCount >= 1 ? randomFrom(cfg.sideBetOptions) : null;
-	const rightSidebet = sideBetCount >= 2 ? randomFrom(cfg.sideBetOptions) : null;
-	const sidebetTotal = (leftSidebet ?? 0) + (rightSidebet ?? 0);
-
-	// Pick hand bet affordable given balance
+	// Pick hand bet first (must fit in budget on its own)
 	const maxBudget = bal * cfg.maxHandsMultiplier;
-	const eligible  = cfg.handBetOptions.filter(b => (b + sidebetTotal) <= maxBudget);
-	const handBet   = eligible.length > 0 ? randomFrom(eligible) : cfg.handBetOptions[0];
+	const eligibleHandBets = cfg.handBetOptions.filter(b => b <= maxBudget);
+	const handBet = eligibleHandBets.length > 0 ? randomFrom(eligibleHandBets) : cfg.handBetOptions[0];
 
+	// Sidebets: total may not exceed 75 % of hand bet, and must also fit in budget
+	const maxSidebetTotal = Math.floor(handBet * 0.75);
+
+	let leftSidebet  = null;
+	let rightSidebet = null;
+
+	if (sideBetCount >= 1) {
+		const eligible = cfg.sideBetOptions.filter(s =>
+			s <= maxSidebetTotal &&
+			(handBet + s) <= maxBudget
+		);
+		leftSidebet = eligible.length > 0 ? randomFrom(eligible) : null;
+	}
+
+	if (sideBetCount >= 2 && leftSidebet !== null) {
+		const remaining = maxSidebetTotal - leftSidebet;
+		const eligible  = cfg.sideBetOptions.filter(s =>
+			s <= remaining &&
+			(handBet + leftSidebet + s) <= maxBudget
+		);
+		rightSidebet = eligible.length > 0 ? randomFrom(eligible) : null;
+	}
+
+	const sidebetTotal = (leftSidebet ?? 0) + (rightSidebet ?? 0);
 	const totalPerHand = handBet + sidebetTotal;
 	const hands = Math.max(
 		cfg.minHands,
