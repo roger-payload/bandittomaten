@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>🎰 Bandittomaten</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+	<!-- COMPACT HEADER -->
+	<header class="app-header">
+		<div class="header-lights">
+			<span class="header-light"></span><span class="header-light"></span>
+			<span class="header-light"></span><span class="header-light"></span>
+			<span class="header-light"></span>
+		</div>
+		<h1 class="app-title">🎰 Bandittomaten</h1>
+		<div class="header-lights">
+			<span class="header-light"></span><span class="header-light"></span>
+			<span class="header-light"></span><span class="header-light"></span>
+			<span class="header-light"></span>
+		</div>
+	</header>
+
+	<!-- TWO-COLUMN LAYOUT -->
+	<div class="app-layout">
+
+		<!-- ========== LEFT / MAIN ========== -->
+		<div class="main-col">
+
+			<!-- SLOT MACHINE -->
+			<div class="slot-machine" id="slotMachine">
+
+				<div class="slot-marquee">
+					<div class="marquee-lights">
+						<span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+						<span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+						<span class="m-light"></span><span class="m-light"></span>
+					</div>
+					<div class="marquee-text" id="marqueeText">🎰 &nbsp; BANDITTOMATEN &nbsp; 🎰</div>
+					<div class="marquee-lights">
+						<span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+						<span class="m-light"></span><span class="m-light"></span><span class="m-light"></span>
+						<span class="m-light"></span><span class="m-light"></span>
+					</div>
+				</div>
+
+				<div class="slot-body">
+					<div class="slot-reels" id="slotReels"></div>
+				</div>
+
+				<div class="slot-result-line" id="slotResultLine" style="display:none"></div>
+
+				<!-- Player bar + controls -->
+				<div class="slot-bottom">
+					<div class="player-bar">
+						<div class="turn-label" id="currentTurnBanner">—</div>
+						<div class="player-chips" id="playerStrip"></div>
+						<button class="add-chip-btn" id="openAddPlayerBtn" title="Legg til spiller">＋</button>
+					</div>
+					<div class="action-row">
+						<button class="spin-btn" id="spinBtn">
+							<span class="spin-icon">🎰</span>
+							<span class="spin-label">Spin frem skjebnen</span>
+						</button>
+						<button class="btn btn-secondary" id="nextBtn" disabled>Neste offer →</button>
+					</div>
+				</div>
+
+			</div><!-- /slot-machine -->
+
+			<!-- ROUND RESULT -->
+			<section class="result-section" id="resultSection" style="display:none">
+				<div class="result-title" id="resultTitle"></div>
+				<div class="result-summary" id="resultSummary"></div>
+				<div class="result-cards" id="resultCards"></div>
+				<div class="result-balance-badge" id="resultBalanceBadge" style="display:none"></div>
+
+				<div class="balance-prompt" id="balancePrompt" style="display:none">
+					<div class="balance-prompt-header">
+						<span class="balance-prompt-icon">💰</span>
+						<span class="balance-prompt-title">Oppdater kveldens balanse</span>
+					</div>
+					<div class="balance-prompt-row">
+						<span id="balancePromptPlayer" class="balance-prompt-player"></span>
+						<div class="currency-input-wrap">
+							<span class="currency-prefix">€</span>
+							<input type="number" id="balanceInput" class="input currency-input"
+								placeholder="0.00" step="0.01" min="0" autocomplete="off">
+						</div>
+						<div class="balance-prompt-actions">
+							<button class="btn btn-primary btn-sm" id="saveBalanceBtn">Lagre</button>
+							<button class="btn btn-ghost btn-sm" id="skipBalanceBtn">Hopp over</button>
+						</div>
+					</div>
+					<div class="balance-saved-feedback" id="balanceSavedFeedback" style="display:none"></div>
+				</div>
+			</section>
+
+			<!-- DEBUG -->
+			<details class="debug-panel">
+				<summary>🔧 Debug: Siste runde (JSON)</summary>
+				<pre id="debugJson" class="debug-pre">Ingen runde generert ennå.</pre>
+			</details>
+
+		</div><!-- /main-col -->
+
+		<!-- ========== RIGHT SIDEBAR ========== -->
+		<aside class="sidebar-col">
+
+			<!-- Top actions -->
+			<div class="sidebar-actions">
+				<button class="btn btn-gold sidebar-action-btn" id="openAddPlayerSidebarBtn">＋ Spiller</button>
+				<button class="btn btn-danger sidebar-action-btn" id="resetBtn">↺ Start om</button>
+			</div>
+
+			<!-- SESSION BALANCE -->
+			<div class="sidebar-section session-panel" id="sessionPanel">
+				<div class="sidebar-section-title">💰 Kveldens Balanse</div>
+
+				<!-- Not started -->
+				<div id="sessionStartForm">
+					<p class="session-start-hint">Skriv inn kontosaldoen for å starte kvelden:</p>
+					<div class="session-start-row">
+						<div class="currency-input-wrap session-start-input">
+							<span class="currency-prefix">€</span>
+							<input type="number" id="sessionStartInput" class="input currency-input"
+								placeholder="500.00" step="0.01" min="0" autocomplete="off">
+						</div>
+						<button class="btn btn-primary" id="setSessionStartBtn">Start →</button>
+					</div>
+				</div>
+
+				<!-- Started: live display -->
+				<div id="sessionBalanceDisplay" style="display:none">
+					<div class="session-balance-row">
+						<div class="session-balance-block">
+							<span class="session-balance-label">Balanse nå</span>
+							<span class="session-balance-value" id="sessionCurrentValue">€0.00</span>
+						</div>
+						<div class="session-balance-block">
+							<span class="session-balance-label">Kveldens resultat</span>
+							<span class="session-balance-net" id="sessionNetValue">±€0.00</span>
+						</div>
+					</div>
+					<div class="session-start-meta">
+						Start: <span id="sessionStartLabel">€0.00</span>
+						<button class="btn-link" id="editSessionStartBtn">endre</button>
+					</div>
+				</div>
+
+				<!-- Balance sparkline graph -->
+				<div id="balanceGraphWrap" class="balance-graph-wrap" style="display:none"></div>
+			</div>
+
+			<!-- Per-player contributions -->
+			<div class="sidebar-section sidebar-section-featured">
+				<div class="sidebar-section-title">💶 Spillernes bidrag</div>
+				<div id="balanceList" class="balance-list">
+					<div class="leaderboard-empty">Ingen data ennå</div>
+				</div>
+			</div>
+
+			<!-- Awards -->
+			<div class="sidebar-section">
+				<div class="sidebar-section-title">🏆 Kveldens Rekorder</div>
+				<div id="awardsList" class="awards-list">
+					<div class="leaderboard-empty">Rekorder vises etter at saldoer er registrert</div>
+				</div>
+			</div>
+
+			<!-- History -->
+			<div class="sidebar-section" id="historySection" style="display:none">
+				<div class="sidebar-section-title">📜 Historikk</div>
+				<div class="history-list" id="historyList"></div>
+			</div>
+
+		</aside><!-- /sidebar-col -->
+
+	</div><!-- /app-layout -->
+
+</div><!-- /app -->
+
+<!-- BONUS MODAL -->
+<div class="bonus-overlay" id="bonusOverlay" style="display:none">
+	<div class="bonus-modal" id="bonusModal">
+		<div class="bonus-dealer-wrap">
+			<img src="dealer.png" class="bonus-dealer-img" alt="Blackjack Dealer">
+		</div>
+		<div class="bonus-modal-body">
+			<div class="bonus-uh-oh">UH OH!</div>
+			<div class="bonus-headline">DU MÅ SPILLE BLACKJACK!!</div>
+			<div class="bonus-bet-display" id="bonusBetDisplay"></div>
+			<div class="bonus-hands-label" id="bonusHandsLabel"></div>
+			<button class="btn btn-primary bonus-close-btn" id="bonusCloseBtn">Forstått — La oss spille 🃏</button>
+		</div>
+	</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none">
+	<div class="modal" id="playerModal">
+		<div class="modal-header">
+			<h3 id="modalTitle">Ny spiller</h3>
+			<button class="modal-close" id="modalClose" type="button">✕</button>
+		</div>
+		<div class="modal-body" id="modalBody"></div>
+	</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
